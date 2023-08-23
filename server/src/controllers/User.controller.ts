@@ -1,5 +1,5 @@
 import { Response, Request } from "express";
-import { createUser, getUserByID, updateUser } from "../mongo/User.mongo";
+import { createUser, getUserByID, updateUser, userRecipes } from "../mongo/User.mongo";
 import expressAsyncHandler from "express-async-handler";
 import {
   handleErrorMessage,
@@ -41,6 +41,24 @@ export const editUser = expressAsyncHandler(
 
     if (req.user) {
       const { error, data } = await updateUser(id,req.body);
+      if (error) {
+        handleErrorMessage(res, 400, data);
+      } else {
+        handleRouteMessage(200, `/user/${id}`);
+        handleSuccessMessage(res, 200, data);
+      }
+    } else {
+      return;
+    }
+  }
+);
+
+export const getUserRecipeDocs = expressAsyncHandler(
+  async (req: PayloadRequest, res: Response) => {
+    let id = req.params.id;
+
+    if (req.user) {
+      const { error, data } = await userRecipes(id);
       if (error) {
         handleErrorMessage(res, 400, data);
       } else {

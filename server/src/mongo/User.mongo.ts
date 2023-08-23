@@ -65,3 +65,21 @@ export async function updateUser(id: string, data: Partial<IRUser>) {
     };
   }
 }
+
+export async function userRecipes(id: string) {
+  try {
+    const user = await User.findById(id).populate("recipes").select("recipes");
+
+    if (user && user._id) {
+      return {
+        error: false,
+        data: user,
+      };
+    }
+  } catch (error) {
+    return {
+      error: true,
+      data: error,
+    };
+  }
+}
