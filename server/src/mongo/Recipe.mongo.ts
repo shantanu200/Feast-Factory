@@ -10,7 +10,7 @@ export async function createRecipe(id: string, data: Partial<IReciepe>) {
       ingredients: data.ingredients,
       steps: data.steps,
       imageUrl: data.imageUrl,
-      autor: id,
+      author: id,
     });
 
     if (recipe && recipe._id) {
@@ -82,9 +82,11 @@ export async function getRecipes(page: number, limit: number, search: string) {
       ],
     };
 
-    const recipes = await Recipe.find({})
+    const recipes = await Recipe.find(searchfilter)
+      .populate("author", "userName email")
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .exec();
 
     if (recipes && recipes.length > 0) {
       return {
@@ -98,8 +100,8 @@ export async function getRecipes(page: number, limit: number, search: string) {
       };
     } else {
       return {
-        error: true,
-        data: "Recipe Not found on server",
+        error: false,
+        data: [],
       };
     }
   } catch (error) {

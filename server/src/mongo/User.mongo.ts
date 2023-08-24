@@ -5,22 +5,46 @@ import { generateToken } from "../services/WebToken";
 
 export async function createUser(data: IRUser) {
   try {
-    const user = await User.create({
-      userName: data.userName,
-      password: data.password,
-      email: data.email,
+    const existUser = await User.findOne({
+      $or: [{ userName: data.userName }, { email: data.email }],
     });
 
-    if (user && user._id) {
-      return {
-        error: false,
-        data: {
-          userName: user.userName,
-          password: user.password,
-          email: user.email,
-          token: generateToken(user._id),
-        },
-      };
+    if (existUser && existUser._id) {
+      if (existUser.password === data.password) {
+        return {
+          error: false,
+          data: {
+            _id: existUser._id,
+            userName: existUser.userName,
+            email: existUser.email,
+            token: generateToken(existUser._id),
+          },
+        };
+      } else {
+        return {
+          error: true,
+          data: "Please check password",
+        };
+      }
+    } else {
+      const user = await User.create({
+        userName: data.userName,
+        password: data.password,
+        email: data.email,
+      });
+
+      if (user && user._id) {
+        return {
+          error: false,
+          data: {
+            _id: user._id,
+            userName: user.userName,
+            password: user.password,
+            email: user.email,
+            token: generateToken(user._id),
+          },
+        };
+      }
     }
   } catch (error) {
     return {

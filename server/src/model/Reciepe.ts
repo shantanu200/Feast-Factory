@@ -6,7 +6,7 @@ interface IRecipe extends Document {
   ingredients: string[];
   steps: string[];
   imageUrl: string[];
-  autor: Types.ObjectId;
+  author: Types.ObjectId;
 }
 
 const recipeSchema = new Schema<IRecipe>(
@@ -37,7 +37,7 @@ const recipeSchema = new Schema<IRecipe>(
         required: true,
       },
     ],
-    autor: {
+    author: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
