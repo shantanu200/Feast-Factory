@@ -35,7 +35,7 @@ const SignUP: React.FC = () => {
       if (error) {
         alert("Error occured");
       } else {
-        navigate(`/recipe/${data?.data?._id}`);
+        navigate(`/recipe/user/${data?.data?._id}`);
       }
     } catch (error) {
       console.error(error);

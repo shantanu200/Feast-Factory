@@ -6,46 +6,39 @@ import {
   handleErrorMessage,
   handleSuccessMessage,
 } from "../utils/StatusMessage";
-
+import cloudinary from "cloudinary";
 import expressAsyncHandler from "express-async-handler";
 import { PayloadRequest } from "../interfaces/User.Interface";
+import { handleRouteMessage } from "../utils/Message";
+
+cloudinary.v2.config({
+  cloud_name: process.env.CLOUDNAME,
+  api_key: process.env.CLOUDACCESSKEYID,
+  api_secret: process.env.CLOUDNAME,
+});
 
 export const uploadOnBucket = async (req: Request, res: Response) => {
-  const files = req.files as Express.Multer.File[];
-
-  const uploadPromises = files.map((file) => {
-    const params = {
-      Bucket: "garageplusbucket",
-      Key: file.originalname,
-      Body: file.buffer,
-    };
-
-    const uploadResult = s3.upload(params).promise();
-
-    const preSignedUrl = s3.getSignedUrl("getObject", {
-      Bucket: "garageplusbucket",
-      Key: file.originalname,
-    });
-
-    return {
-      fileName: file.originalname,
-      preSignedUrl,
-    };
-  });
-
   try {
-    const links = await Promise.all(uploadPromises);
-    console.log("[Image Upload]: All Images uploaded on AWS server");
-    handleSuccessMessage(res, 200, links);
+    const files = req.files as Express.Multer.File[];
+
+    if (!files) {
+      handleErrorMessage(res, 500, "Please Upload Images");
+    }
+
+    console.log(files);
+
+    let multiplePicPromise = files?.map((picture) =>
+      cloudinary.v2.uploader.upload(picture.path)
+    );
+
+    let imageResponses = await Promise.all(multiplePicPromise);
+
+    if (imageResponses) {
+      handleRouteMessage(200, req.url);
+      handleSuccessMessage(res, 200, imageResponses);
+    }
   } catch (error) {
+    console.error(error);
     handleErrorMessage(res, 500, error);
   }
 };
-
-// export const uploadOnBucket = expressAsyncHandler(
-//   async (req: PayloadRequest, res: Response) => {
-//     if (req.user) {
-//       res.status(200).json(req.body);
-//     }
-//   }
-// );

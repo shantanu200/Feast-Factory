@@ -9,3 +9,8 @@ export interface IRUser {
 export interface PayloadRequest extends Request {
   user?: JwtPayload;
 }
+
+export interface Comment {
+  author: string;
+  comment: string;
+}

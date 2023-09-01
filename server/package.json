@@ -29,6 +29,7 @@
   "dependencies": {
     "@types/multer": "^1.4.7",
     "aws-sdk": "^2.1441.0",
+    "cloudinary": "^1.40.0",
     "multer": "^1.4.5-lts.1"
   }
 }

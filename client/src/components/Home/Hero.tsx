@@ -7,7 +7,7 @@ interface DialogProps {
   setOpen: (value: any) => void;
 }
 
-const Hero: React.FC<DialogProps> = ({ open, setOpen }) => {
+const Hero: React.FC<DialogProps> = ({ setOpen }) => {
   return (
     <Box display={"flex"} width={"100%"}>
       <Stack

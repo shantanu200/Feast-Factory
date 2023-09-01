@@ -12,28 +12,35 @@ import {
   CardHeader,
   Avatar,
   Box,
+  IconButton,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { red } from "@mui/material/colors";
 import { HeroSVG, RecipeImg } from "../assets";
 import Header from "../components/Recipe/Header";
 import CircularProgress from "@mui/material/CircularProgress";
 import { debounce } from "loadsh";
 import NoResults from "../components/Recipe/NoResults";
+import EditIcon from "@mui/icons-material/Edit";
 
 interface IRecipes {
+  _id: string;
   title: string;
   description: string;
   ingredients: string[];
   steps: string[];
   imageUrl: string[];
   author: {
+    _id: string;
     userName: string;
   };
 }
 
 const Recipe: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const _id = location.pathname.split("/")[3];
   const [recipes, setRecipes] = useState<IRecipes[]>([]);
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(10);
@@ -94,6 +101,15 @@ const Recipe: React.FC = () => {
                     }
                     title={recipe.title}
                     subheader={recipe.author.userName}
+                    action={
+                      recipe.author._id === _id && (
+                        <IconButton
+                          onClick={() => navigate(`/recipe/edit/${recipe._id}`)}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      )
+                    }
                   />
                   <CardMedia component={"img"} height={320} image={RecipeImg} />
                   <CardContent>
@@ -115,10 +131,11 @@ const Recipe: React.FC = () => {
                     </Stack>
                     <Button
                       variant="outlined"
-                      onClick={() => navigate("")}
+                      onClick={() => navigate(`/recipe/${recipe._id}`)}
                       sx={{
                         borderColor: "#333333",
                         color: "#333333",
+                        transition: "all ease .6s",
                         "&:hover": {
                           backgroundColor: "#333333",
                           color: "#fff",

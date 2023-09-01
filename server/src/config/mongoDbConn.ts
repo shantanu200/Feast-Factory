@@ -1,13 +1,12 @@
 import mongoose, { ConnectOptions } from "mongoose";
 
-mongoose.set("bufferCommands", false);
-
 export async function connectionDatabase() {
   const uri = process.env.DBURL;
   try {
     const connection = await mongoose.connect(uri, {
       useUnifiedTopology: true,
       useNewUrlParser: true,
+      bufferCommands: false,
     } as ConnectOptions);
 
     if (connection) {

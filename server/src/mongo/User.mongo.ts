@@ -56,7 +56,7 @@ export async function createUser(data: IRUser) {
 
 export async function getUserByID(id: string) {
   try {
-    const user = await User.findById(id);
+    const user = await User.findById(id).populate("recipes");
 
     if (user && user._id) {
       return {

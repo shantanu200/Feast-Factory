@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Box, Chip, Avatar, TextField, Stack } from "@mui/material";
 import { getData, getHData } from "../../server";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface User {
   userName: string;
@@ -14,8 +14,9 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ search, setSearch, searchLength }) => {
+  const navigate = useNavigate();
   const location = useLocation();
-  const _id = location.pathname.split("/")[2];
+  const _id = location.pathname.split("/")[3];
   console.log(_id);
   const [user, setUser] = useState<User>({
     userName: "",
@@ -32,7 +33,6 @@ const Header: React.FC<HeaderProps> = ({ search, setSearch, searchLength }) => {
     }
     fetchData();
   }, [_id]);
-  console.log(user);
   return (
     <Box p={2}>
       <Box width={"100%"} display={"flex"} justifyContent={"space-between"}>
@@ -53,7 +53,7 @@ const Header: React.FC<HeaderProps> = ({ search, setSearch, searchLength }) => {
             avatar={<Avatar>{user.userName[0]?.toUpperCase()}</Avatar>}
             label={`${user.userName}`}
             variant="outlined"
-            onClick={() => alert("Chip is clicked")}
+            onClick={() => navigate(`/user/${_id}`)}
           />
         </Box>
       </Box>

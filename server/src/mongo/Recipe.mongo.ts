@@ -1,3 +1,4 @@
+import { Comment } from "../interfaces/User.Interface";
 import { IReciepe } from "../interfaces/Recipe.Interface";
 import Recipe from "../model/Reciepe";
 import User from "../model/User";
@@ -36,7 +37,10 @@ export async function createRecipe(id: string, data: Partial<IReciepe>) {
 
 export async function getRecipe(id: string) {
   try {
-    const recipe = await Recipe.findById(id);
+    const recipe = await Recipe.findById(id).populate(
+      "author",
+      "userName email recipes"
+    );
 
     if (recipe && recipe._id) {
       return {
@@ -103,6 +107,123 @@ export async function getRecipes(page: number, limit: number, search: string) {
         error: false,
         data: [],
       };
+    }
+  } catch (error) {
+    return {
+      error: false,
+      data: error,
+    };
+  }
+}
+
+export async function createComment(id: string, data: Comment) {
+  try {
+    const { author, comment } = data;
+
+    const insertComment = await Recipe.findByIdAndUpdate(
+      id,
+      {
+        $push: {
+          comments: {
+            author,
+            comment,
+          },
+        },
+      },
+      { new: true }
+    );
+
+    if (insertComment) {
+      return {
+        error: false,
+        data: insertComment,
+      };
+    }
+  } catch (error) {
+    return {
+      error: false,
+      data: error,
+    };
+  }
+}
+
+export async function createReply(id: string, data: any) {
+  try {
+    const { author, comment, commentID } = data;
+
+    const replyComment = await Recipe.findOneAndUpdate(
+      {
+        _id: id,
+        "comments._id": commentID,
+      },
+      {
+        $push: {
+          "comments.$.replies": {
+            author,
+            comment,
+          },
+        },
+      },
+      { new: true }
+    )
+      .populate("comments.replies.author")
+      .exec();
+
+    if (replyComment) {
+      return {
+        error: false,
+        data: replyComment,
+      };
+    }
+  } catch (error) {
+    return {
+      error: false,
+      data: error,
+    };
+  }
+}
+
+export async function getReplies(id: string, commentID: string) {
+  try {
+    const replies = await Recipe.findOne(
+      {
+        _id: id,
+      },
+      { comments: { $elemMatch: { _id: commentID } } }
+    )
+      .populate("comments.replies.author", "_id userName")
+      .exec();
+
+    if (replies) {
+      return {
+        error: false,
+        data: replies,
+      };
+    }
+  } catch (error) {
+    return {
+      error: false,
+      data: error,
+    };
+  }
+}
+
+export async function getAllCommnets(id: string, count: number) {
+  try {
+    const commentData = await Recipe.findById(id)
+      .select({
+        comments: { $slice: count },
+      })
+      .populate("comments.author comments.replies.author", "_id userName")
+      .exec();
+
+    if (commentData) {
+      return {
+        error: false,
+        data: commentData.comments,
+      };
+    } else {
+      return;
     }
   } catch (error) {
     return {

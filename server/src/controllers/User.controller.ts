@@ -1,5 +1,10 @@
 import { Response, Request } from "express";
-import { createUser, getUserByID, updateUser, userRecipes } from "../mongo/User.mongo";
+import {
+  createUser,
+  getUserByID,
+  updateUser,
+  userRecipes,
+} from "../mongo/User.mongo";
 import expressAsyncHandler from "express-async-handler";
 import {
   handleErrorMessage,
@@ -40,7 +45,7 @@ export const editUser = expressAsyncHandler(
     let id = req.params.id;
 
     if (req.user) {
-      const { error, data } = await updateUser(id,req.body);
+      const { error, data } = await updateUser(id, req.body);
       if (error) {
         handleErrorMessage(res, 400, data);
       } else {
@@ -67,6 +72,18 @@ export const getUserRecipeDocs = expressAsyncHandler(
       }
     } else {
       return;
+    }
+  }
+);
+
+export const getTokenUser = expressAsyncHandler(
+  async (req: PayloadRequest, res: Response) => {
+    if (req.user) {
+      console.log(req.user);
+      handleRouteMessage(200, req.url);
+      handleSuccessMessage(res, 200, req.user);
+    } else {
+      handleErrorMessage(res, 500, "Invalid Token Found");
     }
   }
 );
